@@ -50,8 +50,19 @@ func (rw *replyWriter) WriteReply(r Reply) error {
 		msg  = r.Message()
 		addr = rw.addr
 	)
-	if ip := msg.GetGIAddr(); ip != nil && !ip.Equal(net.IPv4zero) {
-		addr.IP = ip
+	giAddr := msg.GetGIAddr()
+	dlog.With("giAddr", giAddr).Info()
+	ciAddr := msg.GetCIAddr()
+	dlog.With("ciAddr", ciAddr).Info()
+	dlog.With("flag", msg.GetFlags()[0]&0x80).Info()
+	if giAddr != nil && !giAddr.Equal(net.IPv4zero) {
+		addr.IP = giAddr
+	} else if (giAddr != nil && giAddr.Equal(net.IPv4zero)) && (ciAddr != nil && ciAddr.Equal(net.IPv4zero)) && msg.GetFlags()[0]&0x80 == 0 {
+		dlog.With("MK", msg.GetYIAddr()).Info()
+		// If the broadcast bit is not set and 'giaddr' is zero and
+		// 'ciaddr' is zero, then the server unicasts DHCPOFFER and DHCPACK
+		// messages to the client's hardware address and 'yiaddr' address
+		addr.IP = msg.GetYIAddr()
 	} else if addr.IP.Equal(net.IPv4zero) || msg.GetFlags()[0]&0x80 > 0 {
 		// Broadcast the reply if the request packet has no address associated with
 		// it, or if the client explicitly asks for a broadcast reply.
