@@ -24,7 +24,7 @@ type PacketGetter interface {
 	GetXID() []byte
 	GetFlags() []byte
 	GetCHAddr() net.HardwareAddr
-
+	GetSecs() []byte
 	GetCIAddr() net.IP
 	GetYIAddr() net.IP
 	GetSIAddr() net.IP
@@ -88,6 +88,12 @@ func (p RawPacket) GetHType() uint8 {
 // GetHLen gets the hardware address length.
 func (p RawPacket) GetHLen() uint8 {
 	return uint8(p.HLen()[0])
+}
+
+func (p RawPacket) GetSecs() []byte {
+	var out [4]byte
+	copy(out[:], p.Secs())
+	return out[:]
 }
 
 // GetXID gets the packet's transaction ID.
@@ -228,6 +234,9 @@ func NewReply(msg PacketGetter) Packet {
 
 	// Copy transaction identifier
 	copy(rep.XID(), msg.GetXID()[:])
+
+	// Copy seconds
+	copy(rep.Secs(), msg.GetSecs()[:])
 
 	// Copy fields from request (per RFC2131, section 4.3, table 3)
 	copy(rep.Flags(), msg.GetFlags())
