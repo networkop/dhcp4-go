@@ -54,7 +54,7 @@ func (rw *replyWriter) WriteReply(r Reply) error {
 	dlog.With("giAddr", giAddr).Info()
 	ciAddr := msg.GetCIAddr()
 	dlog.With("ciAddr", ciAddr).Info()
-	dlog.With("flag", msg.GetFlags()[0]&0x80).Info()
+	dlog.With("unicast", msg.GetFlags()[0]&0x80).Info()
 	if giAddr != nil && !giAddr.Equal(net.IPv4zero) {
 		addr.IP = giAddr
 	} else if (giAddr != nil && giAddr.Equal(net.IPv4zero)) && (ciAddr != nil && ciAddr.Equal(net.IPv4zero)) && msg.GetFlags()[0]&0x80 == 0 {
