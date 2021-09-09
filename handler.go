@@ -57,7 +57,7 @@ func (rw *replyWriter) WriteReply(r Reply) error {
 	dlog.With("unicast", msg.GetFlags()[0]).Info()
 	if giAddr != nil && !giAddr.Equal(net.IPv4zero) {
 		addr.IP = giAddr
-	} else if (giAddr != nil && giAddr.Equal(net.IPv4zero)) && (ciAddr != nil && ciAddr.Equal(net.IPv4zero)) {
+	} else if (giAddr != nil && giAddr.Equal(net.IPv4zero)) && (ciAddr != nil && ciAddr.Equal(net.IPv4zero)) && msg.GetFlags()[0]&0x00 > 1 {
 		dlog.With("MK", msg.GetYIAddr()).Info()
 		// If the broadcast bit is not set and 'giaddr' is zero and
 		// 'ciaddr' is zero, then the server unicasts DHCPOFFER and DHCPACK
